@@ -1,0 +1,43 @@
+===  Simple as it can be ===
+
+<pre>
+
+// re-use DB handles ;)
+function my_shared_db_handle() {
+	if ( ! isset( GlobalSomthing::$saved ) ) {
+		GlobalSomthing::$saved = new PDO(...);
+	}
+	return GlobalSomthing::$saved;
+}
+
+require_once('./lib/PDOSession.php');
+
+///  This does session_start(), and save to the "session" table, saved for 7 days
+new PDOSession(my_shared_db_handle());
+
+$_SESSION['test']++;
+
+echo $_SESSION['test']; // Should increment as you refresh
+
+</pre>
+
+
+===  If you want a different table name ===
+
+<pre>
+
+PDOSession::$table = 'alt_session';
+new PDOSession(my_shared_db_handle());
+
+</pre>
+
+
+===  If you want Zend-Session compatibilty, without the Zend-Session overhead ===
+
+<pre>
+
+Zend_Session::setSaveHandler( new PDOSession__ZendHandler(my_shared_db_handle()) );
+Zend_Session::rememberMe(315360000); // 10 years
+Zend_Session::start();
+
+</pre>
